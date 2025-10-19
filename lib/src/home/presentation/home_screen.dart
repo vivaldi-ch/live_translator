@@ -1,4 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_debouncer/flutter_debouncer.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:live_translator/shared/constants/gemini_constant.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 
@@ -13,8 +18,11 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final SpeechToText _speechToText = SpeechToText();
+  final Debouncer _translatorApiDebouncer = Debouncer();
+
   bool _speechEnabled = false;
   String _lastWords = '';
+  String _translations = '';
 
   @override
   void initState() {
@@ -51,6 +59,44 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _lastWords = result.recognizedWords;
     });
+
+    _debounceTranslate(result.recognizedWords);
+  }
+
+  void _debounceTranslate(String recognizedWords) {
+    _translatorApiDebouncer.debounce(
+      duration: const Duration(milliseconds: 1000),
+      onDebounce: () {
+        _translateThroughPrompt(recognizedWords);
+      }
+    );
+  }
+
+  /// Handle gemini prompt
+  /// TODO: To be moved to a separate domain logic
+  void _translateThroughPrompt(String recognizedWords) {
+    log('Calling Gemini API');
+    Gemini.instance.promptStream(
+      model: GeminiConstant.GEMINI_MODEL,
+      parts: [
+        Part.text(
+          'Translate the following words from Indonesian to English. '
+          'Your response should just be the translation and nothing else. '
+          'Words to be translated: $recognizedWords'),
+      ],
+    ).listen((value) {
+      if (value == null) return;
+
+      setState(() {
+        _translations = value.output ?? '';
+      });
+    }).onError((error, trace) {
+      ScaffoldMessenger.of(context).showSnackBar(_errorSnackBar(error));
+    });
+  }
+
+  SnackBar _errorSnackBar(String? message) {
+    return SnackBar(content: Text('Error: ${message ?? 'Unknown error occured'}'));
   }
 
   @override
@@ -83,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
               height: 8,
             ),
             Text(
-              'Translation: ',
+              'Translation: $_translations',
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.left,
             )

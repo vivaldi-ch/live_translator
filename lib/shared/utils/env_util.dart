@@ -7,4 +7,5 @@ class EnvUtil {
 
   // To be changed
   final String GEMINI_API_KEY = dotenv.env['GEMINI_API_KEY'] ?? '';
+  final String GROQ_API_KEY = dotenv.env['GROQ_API_KEY'] ?? '';
 }
