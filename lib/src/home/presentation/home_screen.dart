@@ -31,7 +31,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /// Each time to start a speech recognition session
   void _startListening() async {
-    await _speechToText.listen(onResult: _onSpeechResult);
+    // Try Indonesian
+    await _speechToText.listen(onResult: _onSpeechResult, localeId: 'in-ID');
     setState(() {});
   }
 
@@ -61,25 +62,32 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                _speechToText.isListening || _lastWords.isNotEmpty
-                    ? _lastWords
-                    // If listening isn't active but could be tell the user
-                    // how to start it, otherwise indicate that speech
-                    // recognition is not yet ready or not supported on
-                    // the target device
-                    : _speechEnabled
-                        ? 'Tap the microphone to start listening...'
-                        : 'Speech not available',
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              _speechToText.isListening || _lastWords.isNotEmpty
+                  ? 'Spoken words: $_lastWords'
+                  // If listening isn't active but could be tell the user
+                  // how to start it, otherwise indicate that speech
+                  // recognition is not yet ready or not supported on
+                  // the target device
+                  : _speechEnabled
+                      ? 'Tap the microphone to start listening...'
+                      : 'Speech not available',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.left,
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Text(
+              'Translation: ',
+              style: Theme.of(context).textTheme.bodyMedium,
+              textAlign: TextAlign.left,
+            )
+          ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
