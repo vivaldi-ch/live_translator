@@ -1,6 +1,24 @@
-# live_translator
+# Live Translator
 
-A new Flutter project.
+This is a Flutter project that serves as a real-time voice translator from Indonesian to English.
+
+## Features
+
+- Real-time speech-to-text transcription.
+- Translation from Indonesian to English using the Gemini AI.
+
+## How it Works
+
+1.  The user taps the microphone button to start speaking.
+2.  The application captures the user's voice and converts it into Indonesian text using the `speech_to_text` package.
+3.  The transcribed text is then sent to the Gemini AI for translation.
+4.  The translated English text is displayed on the screen.
+
+## Core Technologies
+
+- [Flutter](https://flutter.dev/)
+- [speech_to_text](https://pub.dev/packages/speech_to_text)
+- [flutter_gemini](https://pub.dev/packages/flutter_gemini)
 
 ## Getting Started
 
